@@ -12,3 +12,6 @@ Go Shows is a proof-of-concept for an entertainment website that sells shows. It
   - Tailwind
 - Back-end
   - Go
+  - Gorilla Mux
+  - Godotenv
+  - Gorm
