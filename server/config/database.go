@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -10,7 +11,9 @@ import (
 var Instance *gorm.DB
 
 func LoadDatabase() {
-	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	dbPath := os.Getenv("DB_DATABASE")
+
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 
 	Instance = db
 
