@@ -8,14 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
-var Instance *gorm.DB
+var Database *gorm.DB
 
 func LoadDatabase() {
 	dbPath := os.Getenv("DB_DATABASE")
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 
-	Instance = db
+	Database = db
 
 	if err != nil {
 		log.Fatal("Error loading database: ", err.Error())
