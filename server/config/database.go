@@ -20,6 +20,4 @@ func LoadDatabase() {
 	if err != nil {
 		log.Fatal("Error loading database: ", err.Error())
 	}
-
-	db.AutoMigrate()
 }
