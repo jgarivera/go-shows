@@ -1,10 +1,12 @@
 package tickets
 
-import "gorm.io/gorm"
+import "time"
 
 type Ticket struct {
-	gorm.Model
-	Name        string  `json:"name"`
-	Price       float64 `json:"price"`
-	Description string  `json:"description"`
+	ID          uint      `json:"id" gorm:"primarykey"`
+	Name        string    `json:"name"`
+	Price       float64   `json:"price"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
