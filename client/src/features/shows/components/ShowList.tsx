@@ -9,7 +9,8 @@ export default function ShowList({
 }): JSX.Element {
   return (
     <div className="m-3">
-      <p className="text-3xl font-bold my-3">Shows</p>
+      <h1 className="text-3xl font-bold my-3">Shows</h1>
+      <p className="mb-3">These shows are now showing</p>
       {shows.map((show) => {
         return <Show key={show.id} show={show} />;
       })}
