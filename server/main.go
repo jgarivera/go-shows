@@ -13,12 +13,9 @@ func main() {
 	config.LoadDatabase()
 
 	db := config.Database
-
-	db.AutoMigrate(&tickets.Ticket{})
-
 	router := mux.NewRouter().StrictSlash(true)
 
-	tickets.RegisterRoutes(router)
+	tickets.Register(db, router)
 
 	http.ListenAndServe("localhost:80", router)
 }
