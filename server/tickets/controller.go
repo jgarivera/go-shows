@@ -37,11 +37,24 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 func CreateTicket(w http.ResponseWriter, r *http.Request) {
 	var ticket Ticket
 
-	json.NewDecoder(r.Body).Decode(&ticket)
+	defer r.Body.Close()
+
+	if err := json.NewDecoder(r.Body).Decode(&ticket); err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if validErrs := ticket.validate(); len(validErrs) > 0 {
+		err := map[string]interface{}{"validationError": validErrs}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
 
 	config.Database.Create(&ticket)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(ticket)
 }
 
