@@ -37,8 +37,6 @@ func GetTickets(w http.ResponseWriter, r *http.Request) {
 func CreateTicket(w http.ResponseWriter, r *http.Request) {
 	var ticket Ticket
 
-	defer r.Body.Close()
-
 	if err := json.NewDecoder(r.Body).Decode(&ticket); err != nil {
 		panic(err)
 	}
