@@ -8,12 +8,18 @@ import (
 	"github.com/jg-rivera/go-shows/config"
 )
 
+type Message struct {
+	Message string `json:"message"`
+}
+
 func GetTicketById(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
+	w.Header().Set("Content-Type", "application/json")
+
 	if !doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode("Ticket not found")
+		json.NewEncoder(w).Encode(Message{Message: "hi"})
 		return
 	}
 
@@ -21,7 +27,7 @@ func GetTicketById(w http.ResponseWriter, r *http.Request) {
 
 	config.Database.First(&ticket, ticketId)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ticket)
 }
 
@@ -59,9 +65,11 @@ func CreateTicket(w http.ResponseWriter, r *http.Request) {
 func UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
+	w.Header().Set("Content-Type", "application/json")
+
 	if !doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode("Ticket not found")
+		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
 	}
 
@@ -72,16 +80,18 @@ func UpdateTicket(w http.ResponseWriter, r *http.Request) {
 
 	config.Database.Save(&ticket)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ticket)
 }
 
 func DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
+	w.Header().Set("Content-Type", "application/json")
+
 	if !doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode("Ticket not found")
+		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
 	}
 
@@ -89,8 +99,8 @@ func DeleteTicket(w http.ResponseWriter, r *http.Request) {
 
 	config.Database.Delete(&ticket, ticketId)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode("Ticket deleted successfully!")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(Message{Message: "Ticket deleted successfully"})
 }
 
 func doesTicketExist(ticketId string) bool {
