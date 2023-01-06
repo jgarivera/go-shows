@@ -9,7 +9,8 @@ import (
 )
 
 type Message struct {
-	Message string `json:"message"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 func GetTicketById(w http.ResponseWriter, r *http.Request) {
