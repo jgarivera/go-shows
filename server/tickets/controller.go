@@ -51,9 +51,8 @@ func CreateTicket(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if validErrs := ticket.validate(); len(validErrs) > 0 {
-		err := map[string]interface{}{"validationError": validErrs}
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err)
+		json.NewEncoder(w).Encode(Message{Message: "Ticket not created due to validation errors", Data: validErrs})
 		return
 	}
 
