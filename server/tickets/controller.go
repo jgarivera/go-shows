@@ -19,7 +19,7 @@ func GetTicketById(w http.ResponseWriter, r *http.Request) {
 
 	if !doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(Message{Message: "hi"})
+		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
 	}
 
