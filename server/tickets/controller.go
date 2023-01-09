@@ -108,11 +108,7 @@ func doesTicketExist(ticketId string) bool {
 
 	config.Database.First(&ticket, ticketId)
 
-	if ticket.ID == 0 {
-		return false
-	} else {
-		return true
-	}
+	return ticket.ID != 0
 }
 
 func RegisterRoutes(router *mux.Router) {
