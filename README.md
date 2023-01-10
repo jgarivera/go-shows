@@ -9,6 +9,7 @@ Go Shows is a proof-of-concept for an entertainment website that sells shows. It
 - Front-end
   - TypeScript
   - React
+  - React Router
   - Tailwind
 - Back-end
   - Go
