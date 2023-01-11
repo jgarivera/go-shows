@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jg-rivera/go-shows/config"
+	"gorm.io/gorm"
 )
 
 type Message struct {
@@ -13,12 +13,16 @@ type Message struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func GetTicketById(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	Database *gorm.DB
+}
+
+func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if !doesTicketExist(ticketId) {
+	if !h.doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
@@ -26,22 +30,22 @@ func GetTicketById(w http.ResponseWriter, r *http.Request) {
 
 	var ticket Ticket
 
-	config.Database.First(&ticket, ticketId)
+	h.Database.First(&ticket, ticketId)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ticket)
 }
 
-func GetTickets(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) {
 	var tickets []Ticket
 
-	config.Database.Find(&tickets)
+	h.Database.Find(&tickets)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(tickets)
 }
 
-func CreateTicket(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) {
 	var ticket Ticket
 
 	if err := json.NewDecoder(r.Body).Decode(&ticket); err != nil {
@@ -56,18 +60,18 @@ func CreateTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config.Database.Create(&ticket)
+	h.Database.Create(&ticket)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(ticket)
 }
 
-func UpdateTicket(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if !doesTicketExist(ticketId) {
+	if !h.doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
@@ -75,21 +79,21 @@ func UpdateTicket(w http.ResponseWriter, r *http.Request) {
 
 	var ticket Ticket
 
-	config.Database.First(&ticket, ticketId)
+	h.Database.First(&ticket, ticketId)
 	json.NewDecoder(r.Body).Decode(&ticket)
 
-	config.Database.Save(&ticket)
+	h.Database.Save(&ticket)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ticket)
 }
 
-func DeleteTicket(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	ticketId := mux.Vars(r)["id"]
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if !doesTicketExist(ticketId) {
+	if !h.doesTicketExist(ticketId) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
@@ -97,24 +101,24 @@ func DeleteTicket(w http.ResponseWriter, r *http.Request) {
 
 	var ticket Ticket
 
-	config.Database.Delete(&ticket, ticketId)
+	h.Database.Delete(&ticket, ticketId)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(Message{Message: "Ticket deleted successfully"})
 }
 
-func doesTicketExist(ticketId string) bool {
+func (h *Handler) doesTicketExist(ticketId string) bool {
 	var ticket Ticket
 
-	config.Database.First(&ticket, ticketId)
+	h.Database.First(&ticket, ticketId)
 
 	return ticket.ID != 0
 }
 
-func RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/api/tickets", GetTickets).Methods("GET")
-	router.HandleFunc("/api/tickets/{id}", GetTicketById).Methods("GET")
-	router.HandleFunc("/api/tickets", CreateTicket).Methods("POST")
-	router.HandleFunc("/api/tickets/{id}", UpdateTicket).Methods("PUT")
-	router.HandleFunc("/api/tickets/{id}", DeleteTicket).Methods("DELETE")
+func RegisterRoutes(router *mux.Router, handler *Handler) {
+	router.HandleFunc("/api/tickets", handler.GetTickets).Methods("GET")
+	router.HandleFunc("/api/tickets/{id}", handler.GetTicketById).Methods("GET")
+	router.HandleFunc("/api/tickets", handler.CreateTicket).Methods("POST")
+	router.HandleFunc("/api/tickets/{id}", handler.UpdateTicket).Methods("PUT")
+	router.HandleFunc("/api/tickets/{id}", handler.DeleteTicket).Methods("DELETE")
 }

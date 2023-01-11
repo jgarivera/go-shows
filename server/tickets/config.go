@@ -7,5 +7,8 @@ import (
 
 func Register(db *gorm.DB, router *mux.Router) {
 	db.AutoMigrate(&Ticket{})
-	RegisterRoutes(router)
+
+	RegisterRoutes(router, &Handler{
+		Database: db,
+	})
 }
