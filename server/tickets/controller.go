@@ -33,7 +33,7 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) {
 	h.Database.First(&ticket, ticketId)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ticket)
+	json.NewEncoder(w).Encode(Message{Data: ticket})
 }
 
 func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) {
 	h.Database.Find(&tickets)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tickets)
+	json.NewEncoder(w).Encode(Message{Data: tickets})
 }
 
 func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +63,7 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) {
 	h.Database.Create(&ticket)
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(ticket)
+	json.NewEncoder(w).Encode(Message{Message: "Ticket created successfully", Data: ticket})
 }
 
 func (h *Handler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func (h *Handler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	h.Database.Save(&ticket)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(ticket)
+	json.NewEncoder(w).Encode(Message{Message: "Ticket updated successfully", Data: ticket})
 }
 
 func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
