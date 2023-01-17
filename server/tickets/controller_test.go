@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupTest(t *testing.T, r *mux.Router) {
+func setupTest(t *testing.T, r *mux.Router) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"))
 
 	if err != nil {
@@ -19,6 +19,8 @@ func setupTest(t *testing.T, r *mux.Router) {
 	}
 
 	Register(db, r)
+
+	return db
 }
 
 func TestGetTickets(t *testing.T) {
