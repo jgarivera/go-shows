@@ -31,3 +31,31 @@ func (t *Ticket) validate() url.Values {
 
 	return errs
 }
+
+func (t *Ticket) equal(t2 *Ticket) bool {
+	if t.ID != t2.ID {
+		return false
+	}
+
+	if t.Name != t2.Name {
+		return false
+	}
+
+	if t.Price != t2.Price {
+		return false
+	}
+
+	if t.Description != t2.Description {
+		return false
+	}
+
+	if !t.CreatedAt.Equal(t2.CreatedAt) {
+		return false
+	}
+
+	if !t.UpdatedAt.Equal(t2.UpdatedAt) {
+		return false
+	}
+
+	return true
+}
