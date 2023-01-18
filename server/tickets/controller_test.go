@@ -24,6 +24,10 @@ func setupTest(t *testing.T, r *mux.Router) *gorm.DB {
 	return db
 }
 
+type GetTicketsResponse struct {
+	Data []Ticket
+}
+
 func TestGetEmptyTickets(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
@@ -36,7 +40,7 @@ func TestGetEmptyTickets(t *testing.T) {
 		t.Error("Invalid status code", w.Code)
 	}
 
-	var response Message
+	var response GetTicketsResponse
 
 	json.Unmarshal(w.Body.Bytes(), &response)
 
@@ -68,19 +72,19 @@ func TestGetTickets(t *testing.T) {
 		t.Error("Invalid status code", w.Code)
 	}
 
-	var response Message
+	var response GetTicketsResponse
 
 	json.Unmarshal(w.Body.Bytes(), &response)
 
-	data := response.Data
-
-	if data == nil {
-		t.Error("Invalid response", response.Data)
-	}
-
-	tickets := data.([]interface{})
+	tickets := response.Data
 
 	if len(tickets) == 0 {
 		t.Error("No tickets found", tickets)
+	}
+
+	responseTicket := tickets[0]
+
+	if !responseTicket.equal(&ticket) {
+		t.Error("Not the same ticket", responseTicket)
 	}
 }
