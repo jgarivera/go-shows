@@ -35,18 +35,18 @@ func TestGetEmptyTickets(t *testing.T) {
 
 	setupTest(t, r)
 
-	r.ServeHTTP(w, httptest.NewRequest("GET", "/api/tickets", nil))
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/tickets", nil))
 
-	if w.Code != http.StatusOK {
-		t.Error("Invalid status code", w.Code)
+	if status := w.Result().StatusCode; status != http.StatusOK {
+		t.Error("Invalid status code", status)
 	}
 
 	var response GetTicketsResponse
 
-	json.Unmarshal(w.Body.Bytes(), &response)
+	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	if response.Data == nil {
-		t.Error("Invalid response", response.Data)
+	if tickets := response.Data; tickets == nil {
+		t.Error("Invalid response", tickets)
 	}
 }
 
@@ -67,15 +67,15 @@ func TestGetTickets(t *testing.T) {
 
 	db.Create(&ticket)
 
-	r.ServeHTTP(w, httptest.NewRequest("GET", "/api/tickets", nil))
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/tickets", nil))
 
-	if w.Code != http.StatusOK {
-		t.Error("Invalid status code", w.Code)
+	if status := w.Result().StatusCode; status != http.StatusOK {
+		t.Error("Invalid status code", status)
 	}
 
 	var response GetTicketsResponse
 
-	json.Unmarshal(w.Body.Bytes(), &response)
+	json.NewDecoder(w.Result().Body).Decode(&response)
 
 	tickets := response.Data
 
