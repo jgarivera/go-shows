@@ -25,7 +25,8 @@ func setupTest(t *testing.T, r *mux.Router) *gorm.DB {
 }
 
 type GetTicketsResponse struct {
-	Data []Ticket
+	Message
+	Data []Ticket `json:"data,omitempty"`
 }
 
 func TestGetEmptyTickets(t *testing.T) {
