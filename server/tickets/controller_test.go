@@ -1,6 +1,7 @@
 package tickets
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -88,4 +89,40 @@ func TestGetTickets(t *testing.T) {
 	if !responseTicket.equal(&ticket) {
 		t.Error("Not the same ticket", responseTicket)
 	}
+}
+
+type CreateTicketResponse struct {
+	Message
+	Data Ticket `json:"data,omitempty"`
+}
+
+func TestCreateTicket(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := mux.NewRouter()
+
+	setupTest(t, r)
+
+	ticket := Ticket{
+		Name:        "Test",
+		Price:       100.0,
+		Description: "Test description",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	body, err := json.Marshal(ticket)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/tickets", bytes.NewReader(body)))
+
+	if status := w.Result().StatusCode; status != http.StatusCreated {
+		t.Error("Invalid status code", status)
+	}
+
+	var response CreateTicketResponse
+
+	json.NewDecoder(w.Result().Body).Decode(&response)
 }
