@@ -25,6 +25,20 @@ func setupTest(t *testing.T, r *mux.Router) *gorm.DB {
 	return db
 }
 
+func checkTicketSame(t *testing.T, a *Ticket, b *Ticket) {
+	if name := a.Name; name != b.Name {
+		t.Error("Ticket name not the same", name)
+	}
+
+	if description := a.Description; description != b.Description {
+		t.Error("Ticket description not the same", description)
+	}
+
+	if price := a.Price; price != b.Price {
+		t.Error("Ticket price not the same", price)
+	}
+}
+
 type GetTicketsResponse struct {
 	Message
 	Data []Ticket `json:"data,omitempty"`
@@ -123,4 +137,6 @@ func TestCreateTicket(t *testing.T) {
 	var response CreateTicketResponse
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
+
+	checkTicketSame(t, &response.Data, &ticket)
 }
