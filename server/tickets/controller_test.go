@@ -62,8 +62,6 @@ func TestGetTickets(t *testing.T) {
 		Name:        "Test",
 		Price:       100.0,
 		Description: "Test description",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	db.Create(&ticket)
