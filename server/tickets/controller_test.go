@@ -112,7 +112,7 @@ func TestCreateTicket(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
-	setupTest(t, r)
+	db := setupTest(t, r)
 
 	ticket := Ticket{
 		Name:        "Test",
@@ -138,5 +138,13 @@ func TestCreateTicket(t *testing.T) {
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	checkTicketSame(t, &response.Data, &ticket)
+	responseTicket := response.Data
+
+	checkTicketSame(t, &responseTicket, &ticket)
+
+	var savedTicket Ticket
+
+	db.First(&savedTicket, responseTicket.ID)
+
+	checkTicketSame(t, &savedTicket, &ticket)
 }
