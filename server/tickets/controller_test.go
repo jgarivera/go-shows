@@ -118,8 +118,6 @@ func TestCreateTicket(t *testing.T) {
 		Name:        "Test",
 		Price:       100.0,
 		Description: "Test description",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	body, err := json.Marshal(ticket)
