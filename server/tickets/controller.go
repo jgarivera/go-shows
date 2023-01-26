@@ -116,9 +116,9 @@ func (h *Handler) doesTicketExist(ticketId string) bool {
 }
 
 func RegisterRoutes(router *mux.Router, handler *Handler) {
-	router.HandleFunc("/api/tickets", handler.GetTickets).Methods("GET")
-	router.HandleFunc("/api/tickets/{id}", handler.GetTicketById).Methods("GET")
-	router.HandleFunc("/api/tickets", handler.CreateTicket).Methods("POST")
-	router.HandleFunc("/api/tickets/{id}", handler.UpdateTicket).Methods("PUT")
-	router.HandleFunc("/api/tickets/{id}", handler.DeleteTicket).Methods("DELETE")
+	router.HandleFunc("/api/tickets", handler.GetTickets).Methods(http.MethodGet)
+	router.HandleFunc("/api/tickets/{id}", handler.GetTicketById).Methods(http.MethodGet)
+	router.HandleFunc("/api/tickets", handler.CreateTicket).Methods(http.MethodPost)
+	router.HandleFunc("/api/tickets/{id}", handler.UpdateTicket).Methods(http.MethodPut)
+	router.HandleFunc("/api/tickets/{id}", handler.DeleteTicket).Methods(http.MethodDelete)
 }
