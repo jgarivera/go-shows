@@ -3,10 +3,10 @@ package tickets
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/sqlite"
@@ -97,6 +97,44 @@ func TestGetTickets(t *testing.T) {
 	}
 
 	responseTicket := tickets[0]
+
+	if !responseTicket.equal(&ticket) {
+		t.Error("Not the same ticket", responseTicket)
+	}
+}
+
+type GetTicketResponse struct {
+	Message
+	Data Ticket `json:"data,omitempty"`
+}
+
+func TestGetTicket(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := mux.NewRouter()
+
+	db := setupTest(t, r)
+
+	ticket := Ticket{
+		Name:        "Test",
+		Price:       100.0,
+		Description: "Test description",
+	}
+
+	db.Create(&ticket)
+
+	url := "/api/tickets/" + fmt.Sprint(ticket.ID)
+
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, url, nil))
+
+	if status := w.Result().StatusCode; status != http.StatusOK {
+		t.Error("Invalid status code", status)
+	}
+
+	var response GetTicketResponse
+
+	json.NewDecoder(w.Result().Body).Decode(&response)
+
+	responseTicket := response.Data
 
 	if !responseTicket.equal(&ticket) {
 		t.Error("Not the same ticket", responseTicket)
