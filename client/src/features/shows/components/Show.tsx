@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import * as types from "../types";
 
 interface ShowProps {
@@ -6,8 +7,8 @@ interface ShowProps {
 
 export default function Show({ show }: ShowProps): JSX.Element {
   return (
-    <a
-      href="example.com"
+    <Link
+      to="/"
       className="flex mb-2 flex-col items-center bg-white border rounded-lg shadow-md md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
     >
       <img
@@ -30,6 +31,6 @@ export default function Show({ show }: ShowProps): JSX.Element {
           Buy tickets
         </button>
       </div>
-    </a>
+    </Link>
   );
 }
