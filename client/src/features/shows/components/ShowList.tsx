@@ -2,11 +2,11 @@ import React from "react";
 import Show from "./Show";
 import * as types from "../types";
 
-export default function ShowList({
-  shows,
-}: {
+interface ShowListProps {
   shows: types.Show[];
-}): JSX.Element {
+}
+
+export default function ShowList({ shows }: ShowListProps): JSX.Element {
   return (
     <div className="m-3">
       <h1 className="text-3xl font-bold my-3">Shows</h1>
