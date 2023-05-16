@@ -8,7 +8,9 @@ interface ShowProps {
 export default function Show({ show }: ShowProps): JSX.Element {
   return (
     <Link
-      to="/"
+      to={{
+        pathname: `/shows/${show.id}`,
+      }}
       className="flex mb-2 flex-col items-center bg-white border rounded-lg shadow-md md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
     >
       <img
