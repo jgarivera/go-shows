@@ -7,7 +7,7 @@ test("renders title", () => {
   render(
     <MemoryRouter>
       <App />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
   const linkElement = screen.getByText(/Go Shows/i);
   expect(linkElement).toBeInTheDocument();
