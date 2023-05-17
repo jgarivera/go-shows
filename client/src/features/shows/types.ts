@@ -4,3 +4,9 @@ export type Show = {
   imageUrl: string;
   description?: string;
 };
+
+export type Section = {
+  id: number;
+  name: string;
+  availableSeats: number;
+};
