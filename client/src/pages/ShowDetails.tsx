@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom";
 import SectionList from "../features/shows/components/SectionList";
 import { Section } from "../features/shows/types";
+import { useState } from "react";
 
 export default function ShowDetails(): JSX.Element {
   const { showId } = useParams();
 
-  const sections: Section[] = [
+  const [sections] = useState<Section[]>([
     {
       id: 1,
       name: "Front-row",
@@ -16,7 +17,7 @@ export default function ShowDetails(): JSX.Element {
       name: "Upper box",
       availableSeats: 10,
     },
-  ];
+  ]);
 
   return (
     <div>
