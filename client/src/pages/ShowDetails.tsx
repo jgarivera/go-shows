@@ -10,11 +10,13 @@ export default function ShowDetails(): JSX.Element {
     {
       id: 1,
       name: "Front-row",
+      price: 7300,
       availableSeats: 10,
     },
     {
       id: 2,
       name: "Upper box",
+      price: 4500,
       availableSeats: 10,
     },
   ]);

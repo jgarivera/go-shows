@@ -8,5 +8,6 @@ export type Show = {
 export type Section = {
   id: number;
   name: string;
+  price: number;
   availableSeats: number;
 };
