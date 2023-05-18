@@ -17,7 +17,7 @@ export default function ShowDetails(): JSX.Element {
       id: 2,
       name: "Upper box",
       price: 4500,
-      availableSeats: 10,
+      availableSeats: 0,
     },
   ]);
 
