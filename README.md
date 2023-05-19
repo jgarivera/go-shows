@@ -11,6 +11,7 @@ Go Shows is a proof-of-concept for an entertainment website that sells shows. It
   - React
   - React Router
   - Tailwind
+  - Headless UI
 - Back-end
   - Go
   - Gorilla Mux
