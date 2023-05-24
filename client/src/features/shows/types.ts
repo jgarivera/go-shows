@@ -11,3 +11,8 @@ export type Section = {
   price: number;
   availableSeats: number;
 };
+
+export type Seat = {
+  id: number;
+  isOccupied: boolean;
+};
