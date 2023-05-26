@@ -10,9 +10,15 @@ export type Section = {
   name: string;
   price: number;
   availableSeats: number;
+  rows: Row[];
 };
 
 export type Seat = {
   id: number;
   isOccupied: boolean;
+};
+
+export type Row = {
+  id: number;
+  seats: Seat[];
 };
