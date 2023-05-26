@@ -1,18 +1,18 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Seat as SeatType } from "../types";
-import Seat from "./Seat";
 import { Fragment } from "react";
+import { Row as RowType } from "../types";
+import Row from "./Row";
 
 interface SeatSelectionDialogProps {
   isOpen: boolean;
-  seats: SeatType[];
+  rows: RowType[];
   onClose: () => void;
   onCheckout: () => void;
 }
 
 export default function SeatSelectionDialog({
   isOpen,
-  seats,
+  rows,
   onClose,
   onCheckout,
 }: SeatSelectionDialogProps): JSX.Element {
@@ -48,9 +48,9 @@ export default function SeatSelectionDialog({
                 </Dialog.Title>
 
                 <div className="my-2">
-                  {seats.map((seat) => {
-                    return <Seat key={seat.id} isOccupied={seat.isOccupied} />;
-                  })}
+                  {rows.map((row) => (
+                    <Row seats={row.seats} />
+                  ))}
                 </div>
 
                 <button

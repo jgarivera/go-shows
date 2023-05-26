@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Seat, Section as SectionType } from "../types";
+import { Section as SectionType } from "../types";
 import SeatSelectionDialog from "./SeatSelectionDialog";
 
 interface SectionProps {
@@ -8,10 +8,7 @@ interface SectionProps {
 
 export default function Section({ section }: SectionProps): JSX.Element {
   const hasAvailableSeats = section.availableSeats > 0;
-  const seats: Seat[] = [
-    { id: 0, isOccupied: true },
-    { id: 1, isOccupied: false },
-  ];
+  const rows = section.rows;
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -49,7 +46,7 @@ export default function Section({ section }: SectionProps): JSX.Element {
         isOpen={isDialogOpen}
         onCheckout={handleDialogCheckout}
         onClose={handleDialogClose}
-        seats={seats}
+        rows={rows}
       />
     </>
   );
