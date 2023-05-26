@@ -12,12 +12,49 @@ export default function ShowDetails(): JSX.Element {
       name: "Front-row",
       price: 7300,
       availableSeats: 10,
+      rows: [
+        {
+          id: 0,
+          seats: [
+            {
+              id: 0,
+              isOccupied: true,
+            },
+            {
+              id: 1,
+              isOccupied: false,
+            },
+            {
+              id: 2,
+              isOccupied: false,
+            },
+            {
+              id: 3,
+              isOccupied: false,
+            },
+          ],
+        },
+        {
+          id: 1,
+          seats: [
+            {
+              id: 0,
+              isOccupied: true,
+            },
+            {
+              id: 1,
+              isOccupied: false,
+            },
+          ],
+        },
+      ],
     },
     {
       id: 2,
       name: "Upper box",
       price: 4500,
       availableSeats: 0,
+      rows: [],
     },
   ]);
 
