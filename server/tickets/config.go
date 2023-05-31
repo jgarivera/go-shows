@@ -1,13 +1,12 @@
 package tickets
 
 import (
+	"database/sql"
+
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
-func Register(db *gorm.DB, router *mux.Router) {
-	db.AutoMigrate(&Ticket{})
-
+func Register(db *sql.DB, router *mux.Router) {
 	RegisterRoutes(router, &Handler{
 		Database: db,
 	})
