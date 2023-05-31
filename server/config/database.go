@@ -1,23 +1,27 @@
 package config
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-var Database *gorm.DB
+var Database *sql.DB
 
 func LoadDatabase() {
 	dbPath := os.Getenv("DB_DATABASE")
 
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
-
-	Database = db
+	db, err := sql.Open("sqlite3", dbPath)
 
 	if err != nil {
 		log.Fatal("Error loading database: ", err.Error())
 	}
+
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	Database = db
 }
