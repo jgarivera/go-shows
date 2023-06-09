@@ -8,6 +8,6 @@ import (
 
 func Register(db *sql.DB, router *mux.Router) {
 	RegisterRoutes(router, &Handler{
-		Database: db,
+		Repository: NewSqlRepository(db),
 	})
 }
