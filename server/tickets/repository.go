@@ -5,12 +5,12 @@ import (
 )
 
 type Repository interface {
-	GetTicketById(id string) (*Ticket, error)
+	GetTicketById(id uint) (*Ticket, error)
 	GetTickets() ([]*Ticket, error)
 	CreateTicket(t *Ticket) (int64, error)
 	UpdateTicket(t *Ticket) (int64, error)
-	DeleteTicket(id string) (int64, error)
-	DoesTicketExist(id string) (bool, error)
+	DeleteTicket(id uint) (int64, error)
+	DoesTicketExist(id uint) (bool, error)
 }
 
 type SqlRepository struct {
@@ -23,7 +23,7 @@ func NewSqlRepository(Database *sql.DB) *SqlRepository {
 	}
 }
 
-func (r *SqlRepository) GetTicketById(id string) (*Ticket, error) {
+func (r *SqlRepository) GetTicketById(id uint) (*Ticket, error) {
 	t := new(Ticket)
 
 	row := r.Database.QueryRow("SELECT * FROM tickets WHERE id = ?", id)
@@ -81,7 +81,7 @@ func (r *SqlRepository) UpdateTicket(t *Ticket) (int64, error) {
 	return res.RowsAffected()
 }
 
-func (r *SqlRepository) DeleteTicket(id string) (int64, error) {
+func (r *SqlRepository) DeleteTicket(id uint) (int64, error) {
 	res, err := r.Database.Exec("DELETE FROM tickets WHERE id = ?", id)
 
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *SqlRepository) DeleteTicket(id string) (int64, error) {
 	return res.RowsAffected()
 }
 
-func (r *SqlRepository) DoesTicketExist(id string) (bool, error) {
+func (r *SqlRepository) DoesTicketExist(id uint) (bool, error) {
 	row := r.Database.QueryRow("SELECT * FROM tickets WHERE id = ?", id)
 
 	t := new(Ticket)
