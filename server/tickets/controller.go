@@ -1,11 +1,13 @@
 package tickets
 
 import (
+	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 type Message struct {
@@ -14,105 +16,158 @@ type Message struct {
 }
 
 type Handler struct {
-	Database *gorm.DB
+	Repository Repository
 }
 
 func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) {
-	ticketId := mux.Vars(r)["id"]
+	vars := mux.Vars(r)
 
-	w.Header().Set("Content-Type", "application/json")
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
 
-	if !h.doesTicketExist(ticketId) {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
 		return
 	}
 
-	var ticket Ticket
+	ticketId := uint(id)
 
-	h.Database.First(&ticket, ticketId)
+	w.Header().Set("Content-Type", "application/json")
+
+	t, err := h.Repository.GetTicketById(ticketId)
+
+	if err == sql.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
+		return
+	} else if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(Message{Data: ticket})
+	json.NewEncoder(w).Encode(Message{Data: t})
 }
 
 func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) {
-	var tickets []Ticket
+	tickets, err := h.Repository.GetTickets()
 
-	h.Database.Find(&tickets)
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Message{Data: tickets})
 }
 
 func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) {
-	var ticket Ticket
+	var t Ticket
 
-	if err := json.NewDecoder(r.Body).Decode(&ticket); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
 		panic(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if validErrs := ticket.validate(); len(validErrs) > 0 {
+	if validErrs := t.validate(); len(validErrs) > 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not created due to validation errors", Data: validErrs})
 		return
 	}
 
-	h.Database.Create(&ticket)
+	_, err := h.Repository.CreateTicket(&t)
+
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(Message{Message: http.StatusText(http.StatusInternalServerError)})
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(Message{Message: "Ticket created successfully", Data: ticket})
+	json.NewEncoder(w).Encode(Message{Message: "Ticket created successfully", Data: t})
 }
 
 func (h *Handler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
-	ticketId := mux.Vars(r)["id"]
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
+
+	ticketId := uint(id)
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if !h.doesTicketExist(ticketId) {
+	if _, err := h.Repository.DoesTicketExist(ticketId); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
 	}
 
-	var ticket Ticket
+	t, err := h.Repository.GetTicketById(ticketId)
 
-	h.Database.First(&ticket, ticketId)
-	json.NewDecoder(r.Body).Decode(&ticket)
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
 
-	h.Database.Save(&ticket)
+	_, err = h.Repository.UpdateTicket(t)
+
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(Message{Message: "Ticket updated successfully", Data: ticket})
+	json.NewEncoder(w).Encode(Message{Message: "Ticket updated successfully", Data: t})
 }
 
 func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
-	ticketId := mux.Vars(r)["id"]
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
+
+	ticketId := uint(id)
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if !h.doesTicketExist(ticketId) {
+	if _, err := h.Repository.DoesTicketExist(ticketId); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Message{Message: "Ticket not found"})
 		return
 	}
 
-	var ticket Ticket
+	_, err = h.Repository.DeleteTicket(ticketId)
 
-	h.Database.Delete(&ticket, ticketId)
+	if err != nil {
+		log.Fatal(err)
+		respondWithError(w)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(Message{Message: "Ticket deleted successfully"})
 }
 
-func (h *Handler) doesTicketExist(ticketId string) bool {
-	var ticket Ticket
-
-	h.Database.First(&ticket, ticketId)
-
-	return ticket.ID != 0
+func respondWithError(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusInternalServerError)
+	json.NewEncoder(w).Encode(Message{Message: http.StatusText(http.StatusInternalServerError)})
 }
 
 func RegisterRoutes(router *mux.Router, handler *Handler) {
