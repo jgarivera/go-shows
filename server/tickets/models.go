@@ -6,12 +6,12 @@ import (
 )
 
 type Ticket struct {
-	ID          uint      `json:"id"`
-	Name        string    `json:"name"`
-	Price       float64   `json:"price"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          uint       `json:"id"`
+	Name        string     `json:"name"`
+	Price       float64    `json:"price"`
+	Description string     `json:"description"`
+	CreatedAt   *time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt   *time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 func (t *Ticket) validate() url.Values {
@@ -49,11 +49,11 @@ func (t *Ticket) equal(t2 *Ticket) bool {
 		return false
 	}
 
-	if !t.CreatedAt.Equal(t2.CreatedAt) {
+	if c := t.CreatedAt; c != nil && !c.Equal(*t2.CreatedAt) {
 		return false
 	}
 
-	if !t.UpdatedAt.Equal(t2.UpdatedAt) {
+	if u := t.UpdatedAt; u != nil && !u.Equal(*t2.UpdatedAt) {
 		return false
 	}
 
