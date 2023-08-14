@@ -47,7 +47,7 @@ func (r *SqlRepository) GetTickets() ([]*Ticket, error) {
 	for rows.Next() {
 		t := new(Ticket)
 
-		if err := rows.Scan(&t.ID, &t.Name, &t.Description, &t.CreatedAt, &t.UpdatedAt); err != nil {
+		if err := rows.Scan(&t.ID, &t.Name, &t.Price, &t.Description, &t.CreatedAt, &t.UpdatedAt); err != nil {
 			return nil, err
 		}
 
