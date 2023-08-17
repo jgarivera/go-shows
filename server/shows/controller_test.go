@@ -1,4 +1,4 @@
-package tickets
+package shows
 
 import (
 	"bytes"
@@ -41,104 +41,104 @@ func setupTest(t *testing.T, r *mux.Router) Repository {
 	}
 }
 
-func checkTicketSame(t *testing.T, a *Ticket, b *Ticket) {
+func checkShowSame(t *testing.T, a *Show, b *Show) {
 	if name := a.Name; name != b.Name {
-		t.Error("Ticket name not the same", name)
+		t.Error("Show name not the same", name)
 	}
 
 	if description := a.Description; description != b.Description {
-		t.Error("Ticket description not the same", description)
+		t.Error("Show description not the same", description)
 	}
 
 	if price := a.Price; price != b.Price {
-		t.Error("Ticket price not the same", price)
+		t.Error("Show price not the same", price)
 	}
 }
 
-type GetTicketsResponse struct {
+type GetShowsResponse struct {
 	Message
-	Data []Ticket `json:"data,omitempty"`
+	Data []Show `json:"data,omitempty"`
 }
 
-func TestGetEmptyTickets(t *testing.T) {
+func TestGetEmptyShows(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
 	setupTest(t, r)
 
-	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/tickets", nil))
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/shows", nil))
 
 	if status := w.Result().StatusCode; status != http.StatusOK {
 		t.Error("Invalid status code", status)
 	}
 
-	var response GetTicketsResponse
+	var response GetShowsResponse
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	if tickets := response.Data; tickets == nil {
-		t.Error("Invalid response", tickets)
+	if shows := response.Data; shows == nil {
+		t.Error("Invalid response", shows)
 	}
 }
 
-func TestGetTickets(t *testing.T) {
+func TestGetShows(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
 	repo := setupTest(t, r)
 
-	ticket := Ticket{
+	show := Show{
 		ID:          1,
 		Name:        "Test",
 		Price:       100.0,
 		Description: "Test description",
 	}
 
-	repo.CreateTicket(&ticket)
+	repo.CreateShow(&show)
 
-	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/tickets", nil))
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/shows", nil))
 
 	if status := w.Result().StatusCode; status != http.StatusOK {
 		t.Error("Invalid status code", status)
 	}
 
-	var response GetTicketsResponse
+	var response GetShowsResponse
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	tickets := response.Data
+	shows := response.Data
 
-	if len(tickets) == 0 {
-		t.Error("No tickets found", tickets)
+	if len(shows) == 0 {
+		t.Error("No shows found", shows)
 	}
 
-	responseTicket := tickets[0]
+	responseShow := shows[0]
 
-	if !responseTicket.equal(&ticket) {
-		t.Error("Not the same ticket", responseTicket)
+	if !responseShow.equal(&show) {
+		t.Error("Not the same show", responseShow)
 	}
 }
 
-type GetTicketResponse struct {
+type GetShowResponse struct {
 	Message
-	Data Ticket `json:"data,omitempty"`
+	Data Show `json:"data,omitempty"`
 }
 
-func TestGetTicket(t *testing.T) {
+func TestGetShow(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
 	repo := setupTest(t, r)
 
-	ticket := Ticket{
+	show := Show{
 		Name:        "Test",
 		Price:       100.0,
 		Description: "Test description",
 	}
 
-	repo.CreateTicket(&ticket)
+	repo.CreateShow(&show)
 
-	url := fmt.Sprintf("/api/tickets/%d", ticket.ID)
+	url := fmt.Sprintf("/api/shows/%d", show.ID)
 
 	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, url, nil))
 
@@ -146,55 +146,55 @@ func TestGetTicket(t *testing.T) {
 		t.Error("Invalid status code", status)
 	}
 
-	var response GetTicketResponse
+	var response GetShowResponse
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	responseTicket := response.Data
+	responseShow := response.Data
 
-	if !responseTicket.equal(&ticket) {
-		t.Error("Not the same ticket", responseTicket)
+	if !responseShow.equal(&show) {
+		t.Error("Not the same show", responseShow)
 	}
 }
 
-type CreateTicketResponse struct {
+type CreateShowResponse struct {
 	Message
-	Data Ticket `json:"data,omitempty"`
+	Data Show `json:"data,omitempty"`
 }
 
-func TestCreateTicket(t *testing.T) {
+func TestCreateShow(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
 	repo := setupTest(t, r)
 
-	ticket := Ticket{
+	show := Show{
 		Name:        "Test",
 		Price:       100.0,
 		Description: "Test description",
 	}
 
-	body, err := json.Marshal(ticket)
+	body, err := json.Marshal(show)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/tickets", bytes.NewReader(body)))
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodPost, "/api/shows", bytes.NewReader(body)))
 
 	if status := w.Result().StatusCode; status != http.StatusCreated {
 		t.Error("Invalid status code", status)
 	}
 
-	var response CreateTicketResponse
+	var response CreateShowResponse
 
 	json.NewDecoder(w.Result().Body).Decode(&response)
 
-	responseTicket := response.Data
+	responseShow := response.Data
 
-	checkTicketSame(t, &responseTicket, &ticket)
+	checkShowSame(t, &responseShow, &show)
 
-	savedTicket, _ := repo.GetTicketById(responseTicket.ID)
+	savedShow, _ := repo.GetShowById(responseShow.ID)
 
-	checkTicketSame(t, savedTicket, &ticket)
+	checkShowSame(t, savedShow, &show)
 }

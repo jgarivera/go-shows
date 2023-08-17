@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jg-rivera/go-shows/config"
-	"github.com/jg-rivera/go-shows/tickets"
+	"github.com/jg-rivera/go-shows/shows"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	db := config.Database
 	router := mux.NewRouter().StrictSlash(true)
 
-	tickets.Register(db, router)
+	shows.Register(db, router)
 
 	http.ListenAndServe("localhost:80", router)
 }

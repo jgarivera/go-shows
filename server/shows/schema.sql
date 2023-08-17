@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tickets (
+CREATE TABLE IF NOT EXISTS shows (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT,
     price REAL,

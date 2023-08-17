@@ -1,11 +1,11 @@
-package tickets
+package shows
 
 import (
 	"net/url"
 	"time"
 )
 
-type Ticket struct {
+type Show struct {
 	ID          uint       `json:"id"`
 	Name        string     `json:"name"`
 	Price       float64    `json:"price"`
@@ -14,46 +14,46 @@ type Ticket struct {
 	UpdatedAt   *time.Time `json:"updatedAt" db:"updated_at"`
 }
 
-func (t *Ticket) validate() url.Values {
+func (s *Show) validate() url.Values {
 	errs := url.Values{}
 
-	if t.Name == "" {
+	if s.Name == "" {
 		errs.Add("name", "The name field is required")
 	}
 
-	if t.Price == 0 {
+	if s.Price == 0 {
 		errs.Add("price", "The price field is required")
 	}
 
-	if t.Description == "" {
+	if s.Description == "" {
 		errs.Add("description", "The description field is required")
 	}
 
 	return errs
 }
 
-func (t *Ticket) equal(t2 *Ticket) bool {
-	if t.ID != t2.ID {
+func (s *Show) equal(s2 *Show) bool {
+	if s.ID != s2.ID {
 		return false
 	}
 
-	if t.Name != t2.Name {
+	if s.Name != s2.Name {
 		return false
 	}
 
-	if t.Price != t2.Price {
+	if s.Price != s2.Price {
 		return false
 	}
 
-	if t.Description != t2.Description {
+	if s.Description != s2.Description {
 		return false
 	}
 
-	if c := t.CreatedAt; c != nil && !c.Equal(*t2.CreatedAt) {
+	if c := s.CreatedAt; c != nil && !c.Equal(*s2.CreatedAt) {
 		return false
 	}
 
-	if u := t.UpdatedAt; u != nil && !u.Equal(*t2.UpdatedAt) {
+	if u := s.UpdatedAt; u != nil && !u.Equal(*s2.UpdatedAt) {
 		return false
 	}
 
