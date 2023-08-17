@@ -2,27 +2,43 @@ package tickets
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
+	_ "github.com/mattn/go-sqlite3"
+
 	"github.com/gorilla/mux"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
-func setupTest(t *testing.T, r *mux.Router) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"))
+func setupTest(t *testing.T, r *mux.Router) Repository {
+	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 
 	if err != nil {
 		t.Error("Failed to create db")
 	}
 
+	schema, err := os.ReadFile("schema.sql")
+
+	if err != nil {
+		t.Fatalf("failed to read SQL file: %v", err)
+	}
+
+	_, err = db.Exec(string(schema))
+
+	if err != nil {
+		t.Fatalf("failed to create table: %v", err)
+	}
+
 	Register(db, r)
 
-	return db
+	return &SqlRepository{
+		Database: db,
+	}
 }
 
 func checkTicketSame(t *testing.T, a *Ticket, b *Ticket) {
@@ -69,7 +85,7 @@ func TestGetTickets(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
-	db := setupTest(t, r)
+	repo := setupTest(t, r)
 
 	ticket := Ticket{
 		ID:          1,
@@ -78,7 +94,7 @@ func TestGetTickets(t *testing.T) {
 		Description: "Test description",
 	}
 
-	db.Create(&ticket)
+	repo.CreateTicket(&ticket)
 
 	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/tickets", nil))
 
@@ -112,7 +128,7 @@ func TestGetTicket(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
-	db := setupTest(t, r)
+	repo := setupTest(t, r)
 
 	ticket := Ticket{
 		Name:        "Test",
@@ -120,9 +136,9 @@ func TestGetTicket(t *testing.T) {
 		Description: "Test description",
 	}
 
-	db.Create(&ticket)
+	repo.CreateTicket(&ticket)
 
-	url := "/api/tickets/" + fmt.Sprint(ticket.ID)
+	url := fmt.Sprintf("/api/tickets/%d", ticket.ID)
 
 	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, url, nil))
 
@@ -150,7 +166,7 @@ func TestCreateTicket(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := mux.NewRouter()
 
-	db := setupTest(t, r)
+	repo := setupTest(t, r)
 
 	ticket := Ticket{
 		Name:        "Test",
@@ -178,9 +194,7 @@ func TestCreateTicket(t *testing.T) {
 
 	checkTicketSame(t, &responseTicket, &ticket)
 
-	var savedTicket Ticket
+	savedTicket, _ := repo.GetTicketById(responseTicket.ID)
 
-	db.First(&savedTicket, responseTicket.ID)
-
-	checkTicketSame(t, &savedTicket, &ticket)
+	checkTicketSame(t, savedTicket, &ticket)
 }
