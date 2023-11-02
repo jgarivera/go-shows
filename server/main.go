@@ -17,5 +17,5 @@ func main() {
 
 	shows.Register(db, router)
 
-	http.ListenAndServe("localhost:80", router)
+	http.ListenAndServe("localhost:8080", router)
 }
