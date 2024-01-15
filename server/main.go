@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jg-rivera/go-shows/config"
-	"github.com/jg-rivera/go-shows/shows"
+	"github.com/jgarivera/go-shows/config"
+	"github.com/jgarivera/go-shows/shows"
 )
 
 func main() {

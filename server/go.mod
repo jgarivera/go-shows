@@ -1,4 +1,4 @@
-module github.com/jg-rivera/go-shows
+module github.com/jgarivera/go-shows
 
 go 1.19
 
